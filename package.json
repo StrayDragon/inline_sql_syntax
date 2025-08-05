@@ -49,8 +49,8 @@
         "compile": "tsc -p ./",
         "lint": "pnpm dlx prettier --check ./src",
         "watch": "tsc -watch -p ./",
-        "package": "pnpm run vscode:prepublish && vsce package'",
-        "publish": "vsce publish'"
+        "package": "pnpm run vscode:prepublish && echo 'Build completed. To create .vsix file, install vsce globally: npm install -g @vscode/vsce && vsce package'",
+        "publish": "echo 'To publish extension: npm install -g @vscode/vsce && vsce publish'"
     },
     "contributes": {
         "grammars": [
@@ -171,6 +171,14 @@
                     "type": "boolean",
                     "default": false,
                     "markdownDescription": "Enable linting for SQL files."
+                },
+                "inlineSQL.ignoreErrors": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [],
+                    "markdownDescription": "List of error types to ignore during SQL linting. Common values: `trailing-whitespace`, `missing-where`, `unmatched-parentheses`."
                 }
             }
         }

@@ -16,6 +16,7 @@ export type Configuration = {
     dbUser: string;
     dbPassword: string;
     lintSQLFiles: boolean;
+    ignoreErrors: string[];
 };
 
 export function getConfiguration() {

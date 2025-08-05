@@ -16,6 +16,8 @@ async function checkRange(
 
     let errors = null;
     log.appendLine(`linting sql: ${sqlStr}`);
+    const ignoreErrors = configuration.get<string[]>('ignoreErrors');
+    
     if (configuration.get<boolean>('enableDBIntegration')) {
         try {
             log.appendLine('linting sql using live database');
@@ -34,6 +36,24 @@ async function checkRange(
     } else {
         errors = await sqlLint({ sql: sqlStr });
         log.appendLine(`${errors.length} errors found`);
+    }
+    
+    // Filter out ignored errors
+    if (errors && ignoreErrors.length > 0) {
+        const originalCount = errors.length;
+        errors = errors.filter((error: any) => {
+            // Extract error type from error message (e.g., "[sql-lint: missing-where]")
+            const match = error.error.match(/\[sql-lint: ([^\]]+)\]/);
+            if (match) {
+                const errorType = match[1];
+                return !ignoreErrors.includes(errorType);
+            }
+            return true;
+        });
+        const filteredCount = originalCount - errors.length;
+        if (filteredCount > 0) {
+            log.appendLine(`${filteredCount} errors ignored based on configuration`);
+        }
     }
 
     if (errors != null) {
