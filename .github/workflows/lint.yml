@@ -12,7 +12,10 @@ jobs:
             - uses: actions/setup-node@v3
               with:
                   node-version: '17'
-                  cache: 'npm'
-            - run: npm install
-            - run: npm run lint
-            - run: npm run test-compile
+                  cache: 'pnpm'
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: latest
+            - run: pnpm install
+            - run: pnpm run lint
+            - run: pnpm run test-compile

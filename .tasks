@@ -1,5 +1,5 @@
-[npm-watch]
-command=npm run watch
+[pnpm-watch]
+command=pnpm run watch
 output=terminal
 pos=long
 cwd=<root>
@@ -10,12 +10,13 @@ output=terminal
 cwd=<root>
 
 [package]
-command=vsce package
+command=pnpm run package
+output=terminal
 cwd=<root>
 save=2
 
 [publish]
-command=vsce publish
+command=pnpm run publish
 output=terminal
 cwd=<root>
 save=2
