@@ -32,7 +32,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
           cache: 'pnpm'
           
       - name: Install dependencies
@@ -47,9 +47,9 @@ jobs:
       - name: Package extension
         run: |
           if [ "${{ github.event.inputs.prerelease }}" = "true" ]; then
-            vsce package --pre-release --out inline-sql-syntax.vsix
+            vsce package --pre-release --no-dependencies --out inline-sql-syntax.vsix
           else
-            vsce package --out inline-sql-syntax.vsix
+            vsce package --no-dependencies --out inline-sql-syntax.vsix
           fi
           
       - name: Upload VSIX artifact

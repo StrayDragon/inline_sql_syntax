@@ -23,7 +23,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
           cache: 'pnpm'
           
       - name: Install dependencies
@@ -36,7 +36,7 @@ jobs:
         run: npm install -g @vscode/vsce
         
       - name: Package extension
-        run: vsce package --out inline-sql-syntax-${{ github.sha }}.vsix
+        run: vsce package --no-dependencies --out inline-sql-syntax-${{ github.sha }}.vsix
         
       - name: Upload VSIX artifact
         uses: actions/upload-artifact@v4
