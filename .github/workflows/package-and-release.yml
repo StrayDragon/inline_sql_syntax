@@ -1,0 +1,121 @@
+name: Package and Release Extension
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.0.0)'
+        required: true
+        type: string
+      prerelease:
+        description: 'Mark as pre-release'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
+          
+      - name: Install dependencies
+        run: pnpm install
+        
+      - name: Build extension
+        run: pnpm run vscode:prepublish
+        
+      - name: Install vsce
+        run: npm install -g @vscode/vsce
+        
+      - name: Package extension
+        run: |
+          if [ "${{ github.event.inputs.prerelease }}" = "true" ]; then
+            vsce package --pre-release --out inline-sql-syntax.vsix
+          else
+            vsce package --out inline-sql-syntax.vsix
+          fi
+          
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vsix-package
+          path: '*.vsix'
+          retention-days: 30
+          
+  # publish:
+  #   needs: package
+  #   runs-on: ubuntu-latest
+  #   if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+  #   
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
+  #       
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: '18'
+  #         cache: 'npm'
+  #         
+  #     - name: Setup pnpm
+  #       uses: pnpm/action-setup@v2
+  #       with:
+  #         version: latest
+  #         
+  #     - name: Install dependencies
+  #       run: pnpm install
+  #       
+  #     - name: Build extension
+  #       run: pnpm run vscode:prepublish
+  #       
+  #     - name: Publish to Visual Studio Marketplace
+  #       uses: HaaLeo/publish-vscode-extension@v2
+  #       with:
+  #         pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
+  #         registryUrl: https://marketplace.visualstudio.com
+  #         
+  #     - name: Publish to Open VSX Registry
+  #       uses: HaaLeo/publish-vscode-extension@v2
+  #       with:
+  #         pat: ${{ secrets.OPEN_VSX_TOKEN }}
+  #         registryUrl: https://open-vsx.org
+          
+  # release:
+  #   needs: [package, publish]
+  #   runs-on: ubuntu-latest
+  #   if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+  #   
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
+  #       
+  #     - name: Download VSIX artifact
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: vsix-package
+  #         
+  #     - name: Create GitHub Release
+  #       uses: softprops/action-gh-release@v1
+  #       with:
+  #         files: '*.vsix'
+  #         generate_release_notes: true
+  #         prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

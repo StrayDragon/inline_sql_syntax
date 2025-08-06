@@ -49,8 +49,12 @@
         "compile": "tsc -p ./",
         "lint": "pnpm dlx prettier --check ./src",
         "watch": "tsc -watch -p ./",
-        "package": "pnpm run vscode:prepublish && echo 'Build completed. To create .vsix file, install vsce globally: npm install -g @vscode/vsce && vsce package'",
-        "publish": "echo 'To publish extension: npm install -g @vscode/vsce && vsce publish'"
+        "package": "pnpm run vscode:prepublish && vsce package",
+        "package:pre": "pnpm run vscode:prepublish && vsce package --pre-release",
+        "publish": "vsce publish",
+        "publish:pre": "vsce publish --pre-release",
+        "vscode:package": "vsce package --out inline-sql-syntax.vsix",
+        "install:vsce": "npm install -g @vscode/vsce"
     },
     "contributes": {
         "grammars": [
